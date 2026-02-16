@@ -266,10 +266,10 @@ with oxpy.Context():
         Jupyter notebook or Python script.
     </div>
     <ul style="font-size:0.75em; margin-top:1em;">
-        <li class="fragment">Wraps <strong>oxpy</strong> (oxDNA Python bindings)</li>
-        <li class="fragment">Integrates with <strong>oxView</strong> for 3-D visualisation</li>
-        <li class="fragment">Provides built-in <strong>analysis</strong> (mean, align, RMSD/RMSF)</li>
-        <li class="fragment">Designed for <strong>interactive / notebook</strong> workflows</li>
+        <li class="">Wraps <strong>oxpy</strong> (oxDNA Python bindings)</li>
+        <li class="">Integrates with <strong>oxView</strong> for 3-D visualisation</li>
+        <li class="">Provides built-in <strong>analysis</strong> (mean, align, RMSD/RMSF)</li>
+        <li class="">Designed for <strong>interactive / notebook</strong> workflows</li>
     </ul>
 </section>
 
@@ -340,7 +340,7 @@ default_input_file = {
     ...
 }
     </code></pre>
-    <p class="fragment" style="font-size:0.65em;">
+    <p class="" style="font-size:0.65em;">
         Access a fresh copy via <code>get_default_input()</code> &mdash;
         returns a <strong>deep copy</strong> so mutations are safe.
     </p>
@@ -365,7 +365,7 @@ class PathContext(contextlib.ContextDecorator):
     def __exit__(self, exc_type, exc_value, traceback):
         chdir(self.old_path)
     </code></pre>
-    <div class="fragment box" style="font-size:0.7em;">
+    <div class=" box" style="font-size:0.7em;">
         <strong>Why?</strong> &mdash; oxDNA resolves file paths relative to the
         working directory. <code>PathContext</code> ensures the CWD is always
         correct, then restores it afterwards.
@@ -388,7 +388,7 @@ def path_decorator(func):
             return func(self, *args, **kwargs)
     return wrapper
     </code></pre>
-    <div class="fragment" style="font-size:0.7em;">
+    <div class="" style="font-size:0.7em;">
         <p>Used on nearly every <code>Simulation</code> method that touches files:</p>
         <span class="tag">get_init_conf</span>
         <span class="tag">get_last_conf</span>
@@ -492,7 +492,7 @@ input_path = setup_simulation(
         complete simulation lifecycle:
         <strong>setup &rarr; run &rarr; monitor &rarr; analyse &rarr; visualise</strong>
     </div>
-    <pre class="fragment"><code class="language-python" data-trim>
+    <pre class=""><code class="language-python" data-trim>
 class Simulation(MutableMapping):
     def __init__(self, input_file_path: str):
         self._input_file = oxpy.InputFile()
@@ -500,7 +500,7 @@ class Simulation(MutableMapping):
         self.p = None                # process reference
         self.out_dir = dirname(abspath(input_file_path))
     </code></pre>
-    <p class="fragment" style="font-size:0.65em;">
+    <p class="" style="font-size:0.65em;">
         Inherits from <code>MutableMapping</code> &rarr; behaves like a Python <code>dict</code>.
     </p>
 </section>
@@ -529,7 +529,7 @@ for key in sim:
 # Check number of parameters
 len(sim)                      # e.g. 23
     </code></pre>
-    <div class="fragment box" style="font-size:0.65em;">
+    <div class=" box" style="font-size:0.65em;">
         Under the hood, <code>__getitem__</code> / <code>__setitem__</code>
         delegate to the underlying <code>oxpy.InputFile</code> object.
     </div>
@@ -552,7 +552,7 @@ sim.is_alive()    # True / False
 # Stop early
 sim.terminate()
     </code></pre>
-    <div class="two-col fragment" style="font-size:0.65em;">
+    <div class="two-col " style="font-size:0.65em;">
         <div class="box">
             <strong>How it works</strong><br>
             <code>run()</code> saves the current input file,
@@ -585,7 +585,7 @@ def _prun(input_file_path: str):
             manager = oxpy.OxpyManager(input_file)
             manager.run_complete()
     </code></pre>
-    <ul style="font-size:0.65em;" class="fragment">
+    <ul style="font-size:0.65em;" class="">
         <li>Runs in a <strong>separate process</strong> (non-blocking)</li>
         <li>Uses <code>PathContext</code> to cd into the simulation directory</li>
         <li><code>run_complete()</code> executes all configured steps</li>
@@ -616,7 +616,7 @@ n = sim.get_conf_count()
 # Raw trajectory handle (for custom processing)
 ti, di = sim.get_trajectory_handle()
     </code></pre>
-    <p class="fragment" style="font-size:0.6em;">
+    <p class="" style="font-size:0.6em;">
         All decorated with <code>@path_decorator</code> &mdash; directory
         changes are handled automatically.
     </p>
@@ -645,7 +645,7 @@ sim.view_init(overlay=rmsf_dict)
 # With observable plotted alongside
 sim.view_traj(op=rmsd_array)
     </code></pre>
-    <p class="fragment" style="font-size:0.6em;">
+    <p class="" style="font-size:0.6em;">
         Uses <code>ipywidgets</code> for the trajectory slider and
         <code>oxDNA_analysis_tools.UTILS.oxview.oxdna_conf</code>
         for rendering.
@@ -682,7 +682,7 @@ sim.view_traj(op=rmsd_array)
 RMSDs, RMSFs = sim.compute_deviations(mean_conf, ncpus=4)
         </code></pre>
     </div>
-    <p class="fragment" style="font-size:0.6em;">
+    <p class="" style="font-size:0.6em;">
         All methods delegate to the corresponding OAT top-level functions
         (<code>mean</code>, <code>align</code>, <code>deviations</code>).
     </p>
