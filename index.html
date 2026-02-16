@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>oxDNA Analysis Tools &mdash; The Boilerplate Module</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/black.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css">
+    <style>
+        :root {
+            --r-heading-color: #58a6ff;
+            --r-link-color: #79c0ff;
+            --r-main-font-size: 32px;
+        }
+        .reveal h1, .reveal h2, .reveal h3 {
+            text-transform: none;
+        }
+        .reveal pre {
+            width: 100%;
+            font-size: 0.48em;
+        }
+        .reveal pre code {
+            max-height: 520px;
+            padding: 16px;
+        }
+        .reveal .small-code pre {
+            font-size: 0.42em;
+        }
+        .reveal ul { text-align: left; }
+        .reveal li { margin-bottom: 0.4em; }
+        .fragment.highlight-current-blue.visible {
+            color: #58a6ff;
+        }
+        .box {
+            background: rgba(88,166,255,0.1);
+            border: 1px solid #58a6ff;
+            border-radius: 8px;
+            padding: 18px 24px;
+            margin: 12px 0;
+            text-align: left;
+        }
+        .two-col {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+        }
+        .two-col > * { flex: 1; }
+        .arch-box {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid #444;
+            border-radius: 6px;
+            padding: 10px 14px;
+            margin: 6px 0;
+            text-align: center;
+            font-size: 0.85em;
+        }
+        .arch-box.highlight {
+            border-color: #58a6ff;
+            background: rgba(88,166,255,0.12);
+        }
+        .arrow { font-size: 1.4em; text-align: center; color: #888; }
+        .tag {
+            display: inline-block;
+            background: #58a6ff22;
+            border: 1px solid #58a6ff;
+            border-radius: 4px;
+            padding: 2px 10px;
+            font-size: 0.7em;
+            margin: 2px;
+        }
+        .warn {
+            color: #f0883e;
+        }
+        .green { color: #3fb950; }
+    </style>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- ============================================================ -->
+<!-- TITLE -->
+<!-- ============================================================ -->
+<section>
+    <h1 style="font-size:1.6em;">OAT boilerplate consistent, documented <br> &rarr; reproducible simulations</h1>
+
+    <p style="font-size:0.6em; color:#666;">Michael Matthies TUM</p>
+</section>
+
+<!-- ============================================================ -->
+<!-- "Normal simulations" -->
+<!-- ============================================================ -->
+<section>
+    <h2 style="font-size:1.6em;">Classical way to setup simulations</h2>
+    <pre><code class="language-text" data-trim>
+        Pulling_old
+        ├── exploratory
+        │   ├── backup
+        │   ├── init_conditions
+        │   ├── my_out
+        │   ├── out
+        │   │   ├── replica_0
+        │   │   ├── ...
+        │   │   ├── replica_N
+        │   ├── out_new
+        │   │   ├── replica_0
+        │   │   ├── ...
+        │   │   ├── replica_N
+        │   └── out_new_slow
+        │       ├── replica_0
+        │       ├── ...
+        │       ├── replica_N
+        ├── init
+           ├── Fw__Free_energy_landscape_simulations_of_TMSD_with_mismatches_using_OxDNA
+           └── corrected
+    </code></pre>
+    <ul style="font-size:0.75em; margin-top:1em;">
+        <li class="fragment">Hard to view | analyze</li>
+        <li class="fragment">Over 2 years this grew into 5TB of data and folders</li>
+    </ul>
+</section>
+
+
+
+<!-- ============================================================ -->
+<!-- The Ecosystem Gap-->
+<!-- ============================================================ -->
+<section>
+    <h2>The Ecosystem</h2>
+    <div style="max-width:600px; margin:auto;">
+        <div class="arch-box">User Script / Jupyter Notebook</div>
+        <!-- <div class="arrow">&darr;</div> -->
+        <div class="arch-box highlight "  style="visibility:hidden;"><strong>boilerplate.py</strong><br>
+            <!-- <span style="font-size:0.75em;">Simulation &middot; setup_simulation &middot; PathContext</span> -->
+        </div>
+        <!-- <div class="arrow">&darr;</div> -->
+        <div class="two-col fragment" style="gap:10px;" >
+            <div class="arch-box">OAT Modules<br><span style="font-size:0.7em;">mean &middot; align &middot; deviations ... </span></div>
+            <div class="arch-box">oxView<br><span style="font-size:0.7em;">3-D visualisation and setup</span></div>            
+            <div class="arch-box">oxpy<br><span style="font-size:0.7em;">InputFile &middot; OxpyManager</span></div>
+        </div>
+        <!-- <div class="arrow">&darr;</div> -->
+        <div class="arch-box">oxDNA C++ Engine</div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- OAT-->
+<!-- ============================================================ -->
+<section>
+    <h2>OAT (oxDNA_analysis_tools)</h2>
+        <div class="box">
+        A set of python modules and scripts to analyse oxDNA trajectories.
+    </div>
+     <div class="two-col fragment" style="gap:10px;" >
+            <div class="arch-box">
+            <img src="images/oat.png" style="width:70%; height:auto;">
+            </div>
+            <div class="arch-box">
+                 <pre><code class="language-text" data-trim>
+                    oxDNA_analysis_tools.UTILS
+                    ├── RyeReader.py
+                    ├── __init__.py
+                    ├── boilerplate
+                    ├── constants.py
+                    ├── data_structures.py
+                    ├── geom.py
+                    ├── logger.py
+                    ├── oat_multiprocesser.py
+                    ├── oxview.py
+                    ├── pdb.py
+                    ├── pdb_templates
+                    └── utils.py
+                 </code></pre>
+            </div>
+            
+     </div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- View-->
+<!-- ============================================================ -->
+<section>
+    <h2>oxView</h2>
+
+    <div class="arch-box">
+    <img src="images/oxview.png" style="width:70%; height:auto;">
+        <span style="font-size:0.75em;">https://sulcgroup.github.io/oxdna-viewer/</span>
+    </div>
+</section>
+
+
+
+<!-- ============================================================ -->
+<!-- oxpy-->
+<!-- ============================================================ -->
+<section>
+    <h2>oxpy</h2>
+
+    <div class="arch-box">
+        <pre><code class="language-python" data-trim>
+import numpy as np
+import oxpy
+
+with oxpy.Context():
+	# init the manager with the given input file
+	manager = oxpy.OxpyManager("input")
+	
+	# run 1k steps
+	manager.run(1000)
+	
+	# change the temperature
+	manager.update_temperature(0.11)
+	
+	# run 1k steps more
+	manager.run(1000)
+	
+	# do some computation with the current configuration
+	particles = manager.config_info().particles()
+	
+	# compute the average position of the particles' backbones
+	avg_pos = np.average(list(map(lambda p: p.backbone_site(), particles)), axis=0)
+	print("Average final position:", avg_pos)
+	
+	# and the interaction energy between the first two particles
+	print("Interaction energy between particle 0 and particle 1:", 
+            manager.config_info().interaction.pair_interaction(particles[0], particles[1]))
+        </code></pre>
+    </div>
+</section>
+
+
+
+<!-- ============================================================ -->
+<!-- The Ecosystem  boilerplate-->
+<!-- ============================================================ -->
+<section>
+    <h2>The Ecosystem</h2>
+    <div style="max-width:600px; margin:auto;">
+        <div class="arch-box">User Script / Jupyter Notebook</div>
+        <!-- <div class="arrow">&darr;</div> -->
+        <div class="arch-box highlight fragment " ><strong>boilerplate.py</strong><br>
+            <!-- <span style="font-size:0.75em;">Simulation &middot; setup_simulation &middot; PathContext</span> -->
+        </div>
+        <!-- <div class="arrow">&darr;</div> -->
+        <div class="two-col " style="gap:10px;" >
+            <div class="arch-box">OAT Modules<br><span style="font-size:0.7em;">mean &middot; align &middot; deviations ... </span></div>
+            <div class="arch-box">oxView<br><span style="font-size:0.7em;">3-D visualisation and setup</span></div>            
+            <div class="arch-box">oxpy<br><span style="font-size:0.7em;">InputFile &middot; OxpyManager</span></div>
+        </div>
+        <!-- <div class="arrow">&darr;</div> -->
+        <div class="arch-box">oxDNA C++ Engine</div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- WHAT IS IT? -->
+<!-- ============================================================ -->
+<section>
+    <h2>What is the Boilerplate Module?</h2>
+    <div class="box">
+        A high-level Python interface for setting up, running, analysing and
+        visualising <strong>oxDNA simulations</strong> &mdash; all from a
+        Jupyter notebook or Python script.
+    </div>
+    <ul style="font-size:0.75em; margin-top:1em;">
+        <li class="fragment">Wraps <strong>oxpy</strong> (oxDNA Python bindings)</li>
+        <li class="fragment">Integrates with <strong>oxView</strong> for 3-D visualisation</li>
+        <li class="fragment">Provides built-in <strong>analysis</strong> (mean, align, RMSD/RMSF)</li>
+        <li class="fragment">Designed for <strong>interactive / notebook</strong> workflows</li>
+    </ul>
+</section>
+
+
+
+<!-- ============================================================ -->
+<!-- MODULE MAP -->
+<!-- ============================================================ -->
+<section>
+    <h2>Module Map</h2>
+    <pre><code class="language-text" data-trim>
+boilerplate.py  (446 lines)
+  │
+  │── Simulation(MutableMapping)        main class
+  │
+  │── Constants
+  │     │── default_input_file          dict[str,str]
+  │
+  │-- Helpers
+  │     │── PathContext                  ContextDecorator
+  │     │── path_decorator              function decorator
+  │     │── get_default_input()         -> dict
+  │     │── setup_simulation(...)       -> str  (input path)
+  │
+  │-- Internal
+        │── _prun(input_file_path)      runs sim in subprocess
+
+    </code></pre>
+     <!-- │-- Simulation(MutableMapping)        main class -->
+        <!-- │-- dict interface  (__get/set/del/iter/len__)
+        │-- config access   (get_init_conf, get_last_conf, ...)
+        │-- visualisation   (view_init, view_last, view_traj, ...)
+        │-- sim control     (run, is_alive, terminate)
+        │-- analysis        (compute_mean, compute_align, ...)
+        │-- plotting        (plot_energy) -->
+</section>
+
+<!-- ============================================================ -->
+<!-- MODULE MAP -->
+<!-- ============================================================ -->
+<section>
+    <h2>Lets have a closer look.</h2>
+</section>
+
+
+
+
+<!-- ============================================================ -->
+<!-- DEFAULT INPUT FILE -->
+<!-- ============================================================ -->
+<section>
+    <h2><code>default_input_file</code></h2>
+    <p style="font-size:0.7em; color:#8b949e;">Sensible defaults for an oxDNA MD simulation</p>
+    <pre><code class="language-python" data-trim data-noescape>
+default_input_file = {
+    "T"                     : "20C",
+    "steps"                 : "1e9",
+    "salt_concentration"    : "1",
+    "backend"               : "CUDA",
+    "interaction_type"      : "DNA2",
+    "print_conf_interval"   : "1e5", # Note this gives back 10k frames, not 2k as we usually do.
+    "print_energy_every"    : "1e4",
+    "dt"                    : "0.005",
+    "sim_type"              : "MD",
+    "ensemble"              : "NVT",
+    "thermostat"            : "john",
+    "backend_precision"     : "mixed",
+    ...
+}
+    </code></pre>
+    <p class="fragment" style="font-size:0.65em;">
+        Access a fresh copy via <code>get_default_input()</code> &mdash;
+        returns a <strong>deep copy</strong> so mutations are safe.
+    </p>
+</section>
+
+<!-- ============================================================ -->
+<!-- PATHCONTEXT -->
+<!-- ============================================================ -->
+<section>
+    <h2><code>PathContext</code></h2>
+    <p style="font-size:0.7em; color:#8b949e;">Context manager <em>and</em> decorator for temporary directory changes</p>
+    <pre><code class="language-python" data-trim>
+class PathContext(contextlib.ContextDecorator):
+    def __init__(self, out_dir):
+        self.out_dir = out_dir
+        self.old_path = None
+
+    def __enter__(self):
+        self.old_path = getcwd()
+        chdir(self.out_dir)
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        chdir(self.old_path)
+    </code></pre>
+    <div class="fragment box" style="font-size:0.7em;">
+        <strong>Why?</strong> &mdash; oxDNA resolves file paths relative to the
+        working directory. <code>PathContext</code> ensures the CWD is always
+        correct, then restores it afterwards.
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- PATH DECORATOR -->
+<!-- ============================================================ -->
+<section>
+    <h2><code>path_decorator</code></h2>
+    <p style="font-size:0.7em; color:#8b949e;">
+        Wraps <code>Simulation</code> methods with <code>PathContext(self.out_dir)</code>
+    </p>
+    <pre><code class="language-python" data-trim>
+def path_decorator(func):
+    @wraps(func)
+    def wrapper(self, *args, **kwargs):
+        with PathContext(self.out_dir):
+            return func(self, *args, **kwargs)
+    return wrapper
+    </code></pre>
+    <div class="fragment" style="font-size:0.7em;">
+        <p>Used on nearly every <code>Simulation</code> method that touches files:</p>
+        <span class="tag">get_init_conf</span>
+        <span class="tag">get_last_conf</span>
+        <span class="tag">get_conf</span>
+        <span class="tag">compute_mean</span>
+        <span class="tag">compute_align</span>
+        <span class="tag">compute_deviations</span>
+        <span class="tag">plot_energy</span>
+        <span class="tag">get_log</span>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SETUP_SIMULATION -->
+<!-- ============================================================ -->
+<section>
+    <h2><code>setup_simulation()</code></h2>
+    <pre><code class="language-python" data-trim>
+def setup_simulation(
+    top_path:   str,               # topology file
+    dat_path:   str,               # initial configuration
+    out_dir:    str,               # output directory
+    parameters: Dict[str, str],    # simulation parameters
+    force_dict: Dict = None,       # external forces (optional)
+    kill_out_dir: bool = False     # remove existing dir?
+) -> str:                          # returns input file path
+    </code></pre>
+    <ul style="font-size:0.65em;" >
+        <li>Creates <code>out_dir</code>, copies topology &amp; configuration</li>
+        <li>Builds an <code>oxpy.InputFile</code> with trajectory / energy / lastconf paths</li>
+        <li>Optionally writes <code>forces.json</code> for external forces</li>
+        <li>Applies user parameters and writes <code>out_dir/input</code></li>
+        <li>Returns the path to the input file</li>
+    </ul>
+</section>
+
+<!-- ============================================================ -->
+<!-- SETUP_SIMULATION EXAMPLE -->
+<!-- ============================================================ -->
+<section>
+    <h2><code>setup_simulation()</code> &mdash; Example</h2>
+    <pre><code class="language-python" data-trim>
+from oxDNA_analysis_tools.UTILS.boilerplate import (
+    get_default_input, setup_simulation
+)
+
+# Start from defaults, then customise
+params = get_default_input()
+params["T"]     = "30C"
+params["steps"] = "1e6"
+
+input_path = setup_simulation(
+    top_path   = "my_structure.top",
+    dat_path   = "my_structure.dat",
+    out_dir    = "run_01",
+    parameters = params,
+)
+# -> creates run_01/ with input, topology, conf, last_conf
+    </code></pre>
+</section>
+
+<!-- ============================================================ -->
+<!-- SETUP WITH FORCES -->
+<!-- ============================================================ -->
+<section>
+    <h2>Adding External Forces</h2>
+    <pre><code class="language-python" data-trim>
+forces = {
+    "force_1": {
+        "type":       "trap",
+        "particle":   "0",
+        "pos0":       "10.0, 10.0, 10.0",
+        "stiff":      "1.0",
+        "rate":       "0.0",
+        "dir":        "0.0, 0.0, 1.0"
+    }
+}
+
+input_path = setup_simulation(
+    top_path     = "design.top",
+    dat_path     = "design.dat",
+    out_dir      = "pull_sim",
+    parameters   = params,
+    force_dict   = forces,       # writes forces.json
+    kill_out_dir = True          # overwrite if exists
+)
+    </code></pre>
+    <p  style="font-size:0.65em;">
+        Forces are serialised as JSON via <code>dump_json()</code> and
+        referenced by <code>external_forces_file = forces.json</code>.
+    </p>
+</section>
+
+<!-- ============================================================ -->
+<!-- SIMULATION CLASS INTRO -->
+<!-- ============================================================ -->
+<section>
+    <h2>The <code>Simulation</code> Class</h2>
+    <div class="box" style="font-size:0.8em;">
+        Central class that wraps an oxDNA input file and provides a
+        complete simulation lifecycle:
+        <strong>setup &rarr; run &rarr; monitor &rarr; analyse &rarr; visualise</strong>
+    </div>
+    <pre class="fragment"><code class="language-python" data-trim>
+class Simulation(MutableMapping):
+    def __init__(self, input_file_path: str):
+        self._input_file = oxpy.InputFile()
+        self._input_file.init_from_filename(input_file_path)
+        self.p = None                # process reference
+        self.out_dir = dirname(abspath(input_file_path))
+    </code></pre>
+    <p class="fragment" style="font-size:0.65em;">
+        Inherits from <code>MutableMapping</code> &rarr; behaves like a Python <code>dict</code>.
+    </p>
+</section>
+
+<!-- ============================================================ -->
+<!-- DICT INTERFACE -->
+<!-- ============================================================ -->
+<section>
+    <h2>Dictionary Interface</h2>
+    <p style="font-size:0.7em; color:#8b949e;">
+        Read and write simulation parameters like a <code>dict</code>
+    </p>
+    <pre><code class="language-python" data-trim>
+sim = Simulation("run_01/input")
+
+# Read a parameter
+print(sim["T"])               # "30C"
+
+# Modify a parameter
+sim["steps"] = "5e6"
+
+# Iterate over all keys
+for key in sim:
+    print(key, sim[key])
+
+# Check number of parameters
+len(sim)                      # e.g. 23
+    </code></pre>
+    <div class="fragment box" style="font-size:0.65em;">
+        Under the hood, <code>__getitem__</code> / <code>__setitem__</code>
+        delegate to the underlying <code>oxpy.InputFile</code> object.
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- RUNNING SIMULATIONS -->
+<!-- ============================================================ -->
+<section>
+    <h2>Running Simulations</h2>
+    <pre><code class="language-python" data-trim>
+sim = Simulation("run_01/input")
+
+# Launch in a background process
+sim.run()
+
+# Check status
+sim.is_alive()    # True / False
+
+# Stop early
+sim.terminate()
+    </code></pre>
+    <div class="two-col fragment" style="font-size:0.65em;">
+        <div class="box">
+            <strong>How it works</strong><br>
+            <code>run()</code> saves the current input file,
+            spawns a <code>multiprocessing.Process</code> that
+            calls <code>_prun()</code>, which uses <code>oxpy.OxpyManager</code>
+            to run the simulation to completion.
+        </div>
+        <!-- <div class="box">
+            <strong>Method chaining</strong><br>
+            <code>run()</code> returns <code>self</code>, so you can write:<br>
+            <code>sim.run().is_alive()</code>
+        </div> -->
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- _prun INTERNAL -->
+<!-- ============================================================ -->
+<section>
+    <h2>Under the Hood: <code>_prun()</code></h2>
+    <pre><code class="language-python" data-trim>
+def _prun(input_file_path: str):
+    with oxpy.Context():
+        path = dirname(abspath(input_file_path))
+        with PathContext(path):
+            input_file = oxpy.InputFile()
+            input_file.init_from_filename(
+                basename(input_file_path)
+            )
+            manager = oxpy.OxpyManager(input_file)
+            manager.run_complete()
+    </code></pre>
+    <ul style="font-size:0.65em;" class="fragment">
+        <li>Runs in a <strong>separate process</strong> (non-blocking)</li>
+        <li>Uses <code>PathContext</code> to cd into the simulation directory</li>
+        <li><code>run_complete()</code> executes all configured steps</li>
+    </ul>
+</section>
+
+<!-- ============================================================ -->
+<!-- CONFIGURATION ACCESS -->
+<!-- ============================================================ -->
+<section>
+    <h2>Configuration Access</h2>
+    <p style="font-size:0.7em; color:#8b949e;">
+        Read configurations via <code>RyeReader</code>
+    </p>
+    <pre><code class="language-python" data-trim>
+# Initial configuration
+(ti, di), conf = sim.get_init_conf()
+
+# Last saved configuration
+(ti, di), conf = sim.get_last_conf()
+
+# Specific frame from trajectory
+(ti, di), conf = sim.get_conf(42)
+
+# Number of frames in trajectory
+n = sim.get_conf_count()
+
+# Raw trajectory handle (for custom processing)
+ti, di = sim.get_trajectory_handle()
+    </code></pre>
+    <p class="fragment" style="font-size:0.6em;">
+        All decorated with <code>@path_decorator</code> &mdash; directory
+        changes are handled automatically.
+    </p>
+</section>
+
+<!-- ============================================================ -->
+<!-- VISUALISATION -->
+<!-- ============================================================ -->
+<section>
+    <h2>oxView Visualisation</h2>
+    <p style="font-size:0.7em; color:#8b949e;">
+        Embedded 3-D views in Jupyter notebooks
+    </p>
+    <pre><code class="language-python" data-trim>
+# View initial / last / specific frame
+sim.view_init()
+sim.view_last()
+sim.view_conf(42)
+
+# Interactive trajectory slider
+sim.view_traj(init=0, height=600)
+
+# With colour overlay (e.g. RMSF data)
+sim.view_init(overlay=rmsf_dict)
+
+# With observable plotted alongside
+sim.view_traj(op=rmsd_array)
+    </code></pre>
+    <p class="fragment" style="font-size:0.6em;">
+        Uses <code>ipywidgets</code> for the trajectory slider and
+        <code>oxDNA_analysis_tools.UTILS.oxview.oxdna_conf</code>
+        for rendering.
+    </p>
+</section>
+
+<!-- ============================================================ -->
+<!-- ANALYSIS -->
+<!-- ============================================================ -->
+<section>
+    <h2>Built-in Analysis</h2>
+    <div class="two-col" style="font-size:0.7em;">
+        <div>
+            <h3 style="font-size:0.9em;">Mean Structure</h3>
+            <pre><code class="language-python" data-trim>
+(ti, di), mean_conf = sim.compute_mean(
+    ncpus=4
+)
+            </code></pre>
+        </div>
+        <div>
+            <h3 style="font-size:0.9em;">Alignment</h3>
+            <pre><code class="language-python" data-trim>
+(ti, di), path = sim.compute_align(
+    ref_conf=mean_conf,
+    ncpus=4
+)
+            </code></pre>
+        </div>
+    </div>
+    <div style="margin-top:1em;">
+        <h3 style="font-size:0.9em;">Deviations (RMSD / RMSF)</h3>
+        <pre><code class="language-python" data-trim>
+RMSDs, RMSFs = sim.compute_deviations(mean_conf, ncpus=4)
+        </code></pre>
+    </div>
+    <p class="fragment" style="font-size:0.6em;">
+        All methods delegate to the corresponding OAT top-level functions
+        (<code>mean</code>, <code>align</code>, <code>deviations</code>).
+    </p>
+</section>
+
+<!-- ============================================================ -->
+<!-- ENERGY PLOTTING -->
+<!-- ============================================================ -->
+<section>
+    <h2>Energy Plotting</h2>
+    <pre><code class="language-python" data-trim>
+sim.plot_energy(ylim=[-2, 0])
+    </code></pre>
+    <ul style="font-size:0.7em;">
+        <li class="fragment"><strong>MD</strong>: plots potential energy vs time / dt</li>
+        <li class="fragment"><strong>MC</strong>: plots potential energy vs MC steps</li>
+        <li class="fragment">Red vertical line marks the target step count</li>
+        <li class="fragment">Quick check to see if the simulation has equilibrated</li>
+    </ul>
+</section>
+
+<!-- ============================================================ -->
+<!-- LOGGING -->
+<!-- ============================================================ -->
+<section>
+    <h2>Logging</h2>
+    <pre><code class="language-python" data-trim>
+# Retrieve simulation log output
+lines = sim.get_log()
+for line in lines[-5:]:
+    print(line, end="")
+    </code></pre>
+    <div class="box" style="font-size:0.7em;">
+        The boilerplate sets <code>no_stdout_energy = true</code> and
+        <code>log_file = logfile</code> so all oxDNA output goes to a file
+        instead of stdout &mdash; essential for notebook use.
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- COMPLETE WORKFLOW -->
+<!-- ============================================================ -->
+<section class="small-code">
+    <h2>Complete Workflow Example</h2>
+    <pre><code class="language-python" data-trim>
+from oxDNA_analysis_tools.UTILS.boilerplate import (
+    get_default_input, setup_simulation, Simulation
+)
+
+# 1. Configure
+params = get_default_input()
+params["T"]     = "25C"
+params["steps"] = "5e5"
+params["backend"] = "CPU"
+
+# 2. Set up
+input_path = setup_simulation(
+    "design.top", "design.dat",
+    "my_run", params, kill_out_dir=True
+)
+
+# 3. Run
+sim = Simulation(input_path)
+sim.run()
+
+# 4. Monitor
+sim.is_alive()
+sim.plot_energy()
+
+# 5. Analyse
+(ti, di), mean_conf = sim.compute_mean()
+RMSDs, RMSFs = sim.compute_deviations(mean_conf)
+
+# 6. Visualise
+sim.view_last(overlay=RMSFs)
+sim.view_traj(op=RMSDs)
+    </code></pre>
+</section>
+
+<!-- ============================================================ -->
+<!-- DESIGN PATTERNS -->
+<!-- ============================================================ -->
+<!-- <section>
+    <h2>Design Patterns</h2>
+    <table style="font-size:0.65em;">
+        <thead>
+            <tr><th>Pattern</th><th>Implementation</th><th>Purpose</th></tr>
+        </thead>
+        <tbody>
+            <tr class="fragment">
+                <td><strong>MutableMapping</strong></td>
+                <td><code>Simulation(MutableMapping)</code></td>
+                <td>Dict-like parameter access</td>
+            </tr>
+            <tr class="fragment">
+                <td><strong>Context Manager</strong></td>
+                <td><code>PathContext</code></td>
+                <td>Safe directory switching</td>
+            </tr>
+            <tr class="fragment">
+                <td><strong>Decorator</strong></td>
+                <td><code>@path_decorator</code></td>
+                <td>DRY path management</td>
+            </tr>
+            <tr class="fragment">
+                <td><strong>Process Isolation</strong></td>
+                <td><code>multiprocessing.Process</code></td>
+                <td>Non-blocking simulation</td>
+            </tr>
+            <tr class="fragment">
+                <td><strong>Facade</strong></td>
+                <td><code>Simulation</code> class</td>
+                <td>Unified API over oxpy + OAT</td>
+            </tr>
+        </tbody>
+    </table>
+</section> -->
+
+<!-- ============================================================ -->
+<!-- DEPENDENCY GRAPH -->
+<!-- ============================================================ -->
+<!-- <section>
+    <h2>Dependencies</h2>
+    <div class="two-col" style="font-size:0.7em;">
+        <div>
+            <h3 style="font-size:0.85em;">External</h3>
+            <ul>
+                <li><code>oxpy</code> &mdash; oxDNA bindings</li>
+                <li><code>numpy</code> &mdash; numerics</li>
+                <li><code>matplotlib</code> &mdash; plotting</li>
+                <li><code>ipywidgets</code> &mdash; interactive UI</li>
+                <li><code>IPython</code> &mdash; display</li>
+            </ul>
+        </div>
+        <div>
+            <h3 style="font-size:0.85em;">Internal (OAT)</h3>
+            <ul>
+                <li><code>UTILS.RyeReader</code> &mdash; conf I/O</li>
+                <li><code>UTILS.oxview</code> &mdash; visualisation</li>
+                <li><code>mean</code> &mdash; mean structure</li>
+                <li><code>align</code> &mdash; trajectory alignment</li>
+                <li><code>deviations</code> &mdash; RMSD/RMSF</li>
+            </ul>
+        </div>
+    </div>
+</section> -->
+
+<!-- ============================================================ -->
+<!-- KEY TAKEAWAYS -->
+<!-- ============================================================ -->
+<section>
+    <h2>Key Takeaways</h2>
+    <ul style="font-size:0.75em;">
+        <li class="fragment"><strong>One import, full lifecycle</strong> &mdash;
+            setup, run, analyse, and visualise from a single module</li>
+        <li class="fragment"><strong>Dict-like Simulation</strong> &mdash;
+            read and tweak any parameter with <code>sim["key"]</code></li>
+        <li class="fragment"><strong>Notebook-first</strong> &mdash;
+            oxView embedding, sliders, and inline plots</li>
+        <li class="fragment"><strong>Clean path handling</strong> &mdash;
+            <code>PathContext</code> + <code>@path_decorator</code>
+            keep directory management invisible</li>
+        <li class="fragment"><strong>Non-blocking runs</strong> &mdash;
+            simulations execute in a separate process</li>
+        <li class="fragment"><strong>Extensible defaults</strong> &mdash;
+            start from <code>get_default_input()</code> and override what you need</li>
+    </ul>
+</section>
+
+<!-- ============================================================ -->
+<!-- RESOURCES -->
+<!-- ============================================================ -->
+<section>
+    <h2>Resources</h2>
+    <ul style="font-size:0.7em;">
+        <li>OAT Documentation:
+            <a href="https://lorenzo-rovigatti.github.io/oxDNA/oat/index.html">
+            lorenzo-rovigatti.github.io/oxDNA/oat</a></li>
+        <li>oxpy Documentation:
+            <a href="https://lorenzo-rovigatti.github.io/oxDNA/oxpy/index.html">
+            lorenzo-rovigatti.github.io/oxDNA/oxpy</a></li>
+        <li>Colab Notebook:
+            <a href="https://colab.research.google.com/drive/1cfYghPMUwrBekgELpo771Ql7AwyCvpKc">
+            OAT Scripting Tutorial</a></li>
+        <li>Source:
+            <code>oxDNA_analysis_tools/UTILS/boilerplate.py</code></li>
+    </ul>
+</section>
+
+<!-- ============================================================ -->
+<!-- END -->
+<!-- ============================================================ -->
+<section>
+    <h1 style="font-size:1.6em;">Thank You</h1>
+    <p style="font-size:0.8em; color:#8b949e;">
+        <code>from oxDNA_analysis_tools.UTILS.boilerplate import Simulation</code>
+    </p>
+</section>
+
+</div><!-- /slides -->
+</div><!-- /reveal -->
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+<script>
+    Reveal.initialize({
+        hash: true,
+        slideNumber: true,
+        transition: 'slide',
+        plugins: [RevealHighlight, RevealNotes]
+    });
+</script>
+</body>
+</html>
